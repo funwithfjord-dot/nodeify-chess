@@ -9,75 +9,73 @@ function App() {
 
   const selectedNode = graph.nodesById[graph.selectedNodeId]
 
-  function handlePieceDrop(sourceSquare, targetSquare) {
-    let moveWasLegal = false
+  function handlePieceDrop({ sourceSquare, targetSquare }) {
+    if (!targetSquare) return false
 
-    setGraph((currentGraph) => {
-      const currentSelected = currentGraph.nodesById[currentGraph.selectedNodeId]
-      const chess = new Chess(currentSelected.fen)
+    const currentSelected = graph.nodesById[graph.selectedNodeId]
+    const chess = new Chess(currentSelected.fen)
 
-      const move = chess.move({
+    let move
+    try {
+      move = chess.move({
         from: sourceSquare,
         to: targetSquare,
         promotion: 'q',
       })
+    } catch {
+      return false
+    }
+    if (!move) return false
 
-      if (!move) {
-        return currentGraph
+    const newFen = chess.fen()
+    const newNodeId = newFen
+    const connectionId = `${currentSelected.id}-${move.san}-${newNodeId}`
+
+    setGraph((g) => {
+      const from = g.nodesById[currentSelected.id]
+      const existing = g.nodesById[newNodeId]
+      const node = existing || {
+        id: newNodeId,
+        fen: newFen,
+        turn: chess.turn(),
+        label: `After ${move.san}`,
+        depth: from.depth + 1,
+        parentIds: [from.id],
+        childIds: [],
+        tags: [],
+        notes: '',
+        createdFromMove: move.san,
       }
 
-      moveWasLegal = true
-
-      const newFen = chess.fen()
-      const newNodeId = newFen
-      const existingNode = currentGraph.nodesById[newNodeId]
-
-      const nextNode =
-        existingNode ||
-        {
-          id: newNodeId,
-          fen: newFen,
-          turn: chess.turn(),
-          label: `After ${move.san}`,
-          depth: currentSelected.depth + 1,
-          parentIds: [currentSelected.id],
-          childIds: [],
-          tags: [],
-          notes: '',
-          createdFromMove: move.san,
-        }
-
-      const connectionId = `${currentSelected.id}-${move.san}-${newNodeId}`
-
       return {
-        ...currentGraph,
+        ...g,
         selectedNodeId: newNodeId,
         nodesById: {
-          ...currentGraph.nodesById,
-          [currentSelected.id]: {
-            ...currentSelected,
-            childIds: currentSelected.childIds.includes(newNodeId)
-              ? currentSelected.childIds
-              : [...currentSelected.childIds, newNodeId],
+          ...g.nodesById,
+          [from.id]: {
+            ...from,
+            childIds: from.childIds.includes(newNodeId)
+              ? from.childIds
+              : [...from.childIds, newNodeId],
           },
-          [newNodeId]: existingNode || nextNode,
+          [newNodeId]: node,
         },
         connectionsById: {
-          ...currentGraph.connectionsById,
+          ...g.connectionsById,
           [connectionId]: {
             id: connectionId,
-            fromNodeId: currentSelected.id,
+            fromNodeId: from.id,
             toNodeId: newNodeId,
             san: move.san,
             lan: `${move.from}${move.to}`,
             color: move.color,
-            ply: currentSelected.depth + 1,
+            ply: from.depth + 1,
           },
         },
       }
     })
 
-    return moveWasLegal
+    return true
   }
 
   return (
@@ -92,11 +90,11 @@ function App() {
           <h2>Board</h2>
           <div className="board-wrap">
             <Chessboard
-              id="nodeify-board"
-              position={selectedNode.fen}
-              onPieceDrop={handlePieceDrop}
-              boardWidth={520}
-              arePiecesDraggable={true}
+              options={{
+                id: 'nodeify-board',
+                position: selectedNode.fen,
+                onPieceDrop: handlePieceDrop,
+              }}
             />
           </div>
         </section>
