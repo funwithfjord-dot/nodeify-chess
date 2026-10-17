@@ -7,6 +7,11 @@
 }
 
 .topbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
   margin-bottom: 16px;
 }
 
@@ -20,34 +25,123 @@
   color: #9ca3af;
 }
 
+.panel-toggles {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.toggle-btn {
+  min-height: 40px;
+  padding: 0 14px;
+  border: 1px solid #374151;
+  border-radius: 8px;
+  background: #1f2937;
+  color: #9ca3af;
+  font: inherit;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.toggle-btn[aria-pressed='true'] {
+  border-color: #3b82f6;
+  color: #f9fafb;
+}
+
+.toggle-btn:hover {
+  background: #273449;
+}
+
+.toggle-btn.reset {
+  border-style: dashed;
+}
+
 .workspace {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+  width: 100%;
 }
 
-.board-layout {
-  align-items: start;
+.empty-note {
+  color: #9ca3af;
+  padding: 24px 0;
 }
 
-.panel {
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.stack-item {
+  min-height: 240px;
+}
+
+.panel-frame {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
   background: #1f2937;
   border: 1px solid #374151;
   border-radius: 12px;
-  padding: 16px;
-}
-
-.panel h2 {
-  margin-top: 0;
-}
-
-.board-panel {
   overflow: hidden;
 }
 
+.panel-handle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 8px 16px;
+  background: #273449;
+  border-bottom: 1px solid #374151;
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.panel-handle:active {
+  cursor: grabbing;
+}
+
+.panel-handle h2 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.panel-close {
+  width: 32px;
+  height: 32px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 1.25rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.panel-close:hover {
+  background: #374151;
+  color: #f9fafb;
+}
+
+.panel-body {
+  flex: 1;
+  min-height: 0;
+  padding: 16px;
+  overflow: auto;
+}
+
 .board-wrap {
+  container-type: size;
   width: 100%;
-  max-width: 520px;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.board-square {
+  width: min(100cqw, 100cqh);
+  height: min(100cqw, 100cqh);
 }
 
 .fen-block {
@@ -61,12 +155,8 @@
   overflow-wrap: anywhere;
 }
 
-@media (min-width: 980px) {
-  .board-layout {
-    grid-template-columns: 560px 1fr;
-  }
-
-  .board-panel {
-    grid-row: span 2;
-  }
+.react-grid-item.react-grid-placeholder {
+  background: #3b82f6;
+  opacity: 0.2;
+  border-radius: 12px;
 }
