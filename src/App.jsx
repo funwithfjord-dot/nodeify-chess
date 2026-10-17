@@ -1,31 +1,35 @@
+import { useState } from 'react'
 import './App.css'
+import { createInitialGraph } from './lib/chess/initialGraph'
 
 function App() {
+  const [graph] = useState(() => createInitialGraph())
+
+  const selectedNode = graph.nodesById[graph.selectedNodeId]
+
   return (
     <div className="app-shell">
       <header className="topbar">
-        <div>
-          <h1>Nodeify Chess</h1>
-          <p className="subtitle">Chess knowledge explorer</p>
-        </div>
+        <h1>Nodeify Chess</h1>
+        <p className="subtitle">Chess knowledge explorer</p>
       </header>
 
       <main className="workspace">
-        <section className="panel hero-panel">
-          <h2>Starting Position</h2>
-          <p>
-            This will become the root neuron of your chess exploration map.
-          </p>
+        <section className="panel">
+          <h2>Selected Position</h2>
+          <p><strong>Label:</strong> {selectedNode.label}</p>
+          <p><strong>Turn:</strong> {selectedNode.turn === 'w' ? 'White' : 'Black'}</p>
+          <p><strong>Depth:</strong> {selectedNode.depth}</p>
+          <p><strong>FEN:</strong></p>
+          <code className="fen-block">{selectedNode.fen}</code>
         </section>
 
         <section className="panel">
-          <h2>Next Build Steps</h2>
-          <ul>
-            <li>Render a chessboard.</li>
-            <li>Load the initial position.</li>
-            <li>Generate legal moves with chess.js.</li>
-            <li>Turn positions into connected nodes.</li>
-          </ul>
+          <h2>Explorer Status</h2>
+          <p><strong>Root Node:</strong> {graph.rootNodeId}</p>
+          <p><strong>Selected Node:</strong> {graph.selectedNodeId}</p>
+          <p><strong>Total Nodes:</strong> {Object.keys(graph.nodesById).length}</p>
+          <p><strong>Total Connections:</strong> {Object.keys(graph.connectionsById).length}</p>
         </section>
       </main>
     </div>
