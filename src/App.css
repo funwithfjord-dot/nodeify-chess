@@ -72,7 +72,7 @@
 }
 
 .stack-item {
-  min-height: 240px;
+  min-height: 320px;
 }
 
 .panel-frame {
@@ -128,6 +128,16 @@
   min-height: 0;
   padding: 16px;
   overflow: auto;
+}
+
+.panel-body.flush {
+  padding: 0;
+  overflow: hidden;
+}
+
+.network-wrap {
+  width: 100%;
+  height: 100%;
 }
 
 .board-wrap {

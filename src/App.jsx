@@ -10,18 +10,21 @@ import {
   PANELS,
   GRID,
   DEFAULT_LAYOUT,
+  mergeLayout,
   loadPanelState,
   savePanelState,
 } from './lib/layout/panels'
 import PanelFrame from './components/PanelFrame'
+import NetworkPanel from './components/NetworkPanel'
 
 const NARROW_WIDTH = 720
 
 function App() {
   const [graph, setGraph] = useState(() => createInitialGraph())
-  const [layout, setLayout] = useState(
-    () => loadPanelState()?.layout ?? DEFAULT_LAYOUT,
-  )
+  const [layout, setLayout] = useState(() => {
+    const saved = loadPanelState()
+    return saved ? mergeLayout(saved.layout) : DEFAULT_LAYOUT
+  })
   const [hidden, setHidden] = useState(() => loadPanelState()?.hidden ?? [])
 
   const { width, containerRef, mounted } = useContainerWidth()
@@ -101,6 +104,10 @@ function App() {
     return true
   }
 
+  function selectNode(id) {
+    setGraph((g) => (g.nodesById[id] ? { ...g, selectedNodeId: id } : g))
+  }
+
   function handleLayoutChange(nextLayout) {
     setLayout((prev) => {
       const merged = prev.map((item) => {
@@ -139,6 +146,10 @@ function App() {
       )
     }
 
+    if (id === 'network') {
+      return <NetworkPanel graph={graph} onSelectNode={selectNode} />
+    }
+
     if (id === 'position') {
       return (
         <>
@@ -164,6 +175,18 @@ function App() {
   const visiblePanels = PANELS.filter((p) => !hidden.includes(p.id))
   const visibleLayout = layout.filter((l) => !hidden.includes(l.i))
   const isNarrow = width > 0 && width < NARROW_WIDTH
+
+  function frame(p) {
+    return (
+      <PanelFrame
+        title={p.title}
+        flush={p.id === 'network'}
+        onHide={() => togglePanel(p.id)}
+      >
+        {renderPanelBody(p.id)}
+      </PanelFrame>
+    )
+  }
 
   return (
     <div className="app-shell">
@@ -200,9 +223,7 @@ function App() {
           <div className="stack">
             {visiblePanels.map((p) => (
               <div key={p.id} className="stack-item">
-                <PanelFrame title={p.title} onHide={() => togglePanel(p.id)}>
-                  {renderPanelBody(p.id)}
-                </PanelFrame>
+                {frame(p)}
               </div>
             ))}
           </div>
@@ -217,11 +238,7 @@ function App() {
             onLayoutChange={handleLayoutChange}
           >
             {visiblePanels.map((p) => (
-              <div key={p.id}>
-                <PanelFrame title={p.title} onHide={() => togglePanel(p.id)}>
-                  {renderPanelBody(p.id)}
-                </PanelFrame>
-              </div>
+              <div key={p.id}>{frame(p)}</div>
             ))}
           </ReactGridLayout>
         )}

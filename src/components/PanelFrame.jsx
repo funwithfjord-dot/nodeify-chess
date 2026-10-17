@@ -1,4 +1,4 @@
-function PanelFrame({ title, onHide, children }) {
+function PanelFrame({ title, onHide, flush = false, children }) {
   return (
     <section className="panel-frame">
       <header className="panel-handle">
@@ -12,7 +12,7 @@ function PanelFrame({ title, onHide, children }) {
           &times;
         </button>
       </header>
-      <div className="panel-body">{children}</div>
+      <div className={flush ? 'panel-body flush' : 'panel-body'}>{children}</div>
     </section>
   )
 }
