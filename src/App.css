@@ -26,6 +26,10 @@
   gap: 16px;
 }
 
+.board-layout {
+  align-items: start;
+}
+
 .panel {
   background: #1f2937;
   border: 1px solid #374151;
@@ -37,6 +41,15 @@
   margin-top: 0;
 }
 
+.board-panel {
+  overflow: hidden;
+}
+
+.board-wrap {
+  width: 100%;
+  max-width: 520px;
+}
+
 .fen-block {
   display: block;
   margin-top: 8px;
@@ -46,4 +59,14 @@
   border-radius: 8px;
   color: #93c5fd;
   overflow-wrap: anywhere;
+}
+
+@media (min-width: 980px) {
+  .board-layout {
+    grid-template-columns: 560px 1fr;
+  }
+
+  .board-panel {
+    grid-row: span 2;
+  }
 }
